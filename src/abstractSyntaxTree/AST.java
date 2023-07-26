@@ -6,10 +6,9 @@ import java.util.Stack;
 import CSEMachine.Beta;
 import CSEMachine.Delta;
 
-/*
- * Abstract Syntax Tree: The nodes use a first-child
- * next-sibling representation.
- */
+//abstract Syntax Tree: The nodes use a first-child
+//next-sibling representation.
+
 public class AST{
   private ASTNode root;
   private ArrayDeque<PendingDeltaBody> pendingDeltaBodyQueue;
@@ -22,9 +21,8 @@ public class AST{
     this.root = node;
   }
 
-  /**
-   * Prints the tree nodes in pre-order fashion.
-   */
+
+  // prints the tree's nodes using a pre-order traversal method.
   public void print(){
     preOrderPrint(root,"");
   }
@@ -49,18 +47,15 @@ public class AST{
       System.out.println(printPrefix+node.getType().getPrintName());
   }
 
-  /**
-   * Standardize this tree
-   */
+ //Standardizing the tree
+
   public void standardize(){
     standardize(root);
     standardized = true;
   }
 
-  /**
-   * Standardize the tree bottom-up
-   * @param node node to standardize
-   */
+// Standardize the tree from the bottom-up.
+// The function takes a node as input and performs the standardization process.
   private void standardize(ASTNode node){
     //standardize the children first
     if(node.getChild()!=null){
@@ -71,14 +66,10 @@ public class AST{
       }
     }
 
-    //all children standardized. now standardize this node
+    //standardize this node
     switch(node.getType()){
       case LET:
-        //       LET              GAMMA
-        //     /     \           /     \
-        //    EQUAL   P   ->   LAMBDA   E
-        //   /   \             /    \
-        //  X     E           X      P
+
         ASTNode equalNode = node.getChild();
         if(equalNode.getType()!=ASTNodeType.EQUAL)
           throw new StandardizeException("LET/WHERE: left child is not EQUAL"); //safety
@@ -89,12 +80,7 @@ public class AST{
         node.setType(ASTNodeType.GAMMA);
         break;
       case WHERE:
-        //make this is a LET node and standardize that
-        //       WHERE               LET
-        //       /   \             /     \
-        //      P    EQUAL   ->  EQUAL   P
-        //           /   \       /   \
-        //          X     E     X     E
+
         equalNode = node.getChild().getSibling();
         node.getChild().setSibling(null);
         equalNode.setSibling(node.getChild());
@@ -103,21 +89,13 @@ public class AST{
         standardize(node);
         break;
       case FCNFORM:
-        //       FCN_FORM                EQUAL
-        //       /   |   \              /    \
-        //      P    V+   E    ->      P     +LAMBDA
-        //                                    /     \
-        //                                    V     .E
+
         ASTNode childSibling = node.getChild().getSibling();
         node.getChild().setSibling(constructLambdaChain(childSibling));
         node.setType(ASTNodeType.EQUAL);
         break;
       case AT:
-        //         AT              GAMMA
-        //       / | \    ->       /    \
-        //      E1 N E2          GAMMA   E2
-        //                       /    \
-        //                      N     E1
+
         ASTNode e1 = node.getChild();
         ASTNode n = e1.getSibling();
         ASTNode e2 = n.getSibling();
@@ -131,13 +109,7 @@ public class AST{
         node.setType(ASTNodeType.GAMMA);
         break;
       case WITHIN:
-        //           WITHIN                  EQUAL
-        //          /      \                /     \
-        //        EQUAL   EQUAL    ->      X2     GAMMA
-        //       /    \   /    \                  /    \
-        //      X1    E1 X2    E2               LAMBDA  E1
-        //                                      /    \
-        //                                     X1    E2
+
         if(node.getChild().getType()!=ASTNodeType.EQUAL || node.getChild().getSibling().getType()!=ASTNodeType.EQUAL)
           throw new StandardizeException("WITHIN: one of the children is not EQUAL"); //safety
         ASTNode x1 = node.getChild().getChild();
@@ -157,11 +129,7 @@ public class AST{
         node.setType(ASTNodeType.EQUAL);
         break;
       case SIMULTDEF:
-        //         SIMULTDEF            EQUAL
-        //             |               /     \
-        //           EQUAL++  ->     COMMA   TAU
-        //           /   \             |      |
-        //          X     E           X++    E++
+
         ASTNode commaNode = new ASTNode();
         commaNode.setType(ASTNodeType.COMMA);
         ASTNode tauNode = new ASTNode();
@@ -176,13 +144,7 @@ public class AST{
         node.setType(ASTNodeType.EQUAL);
         break;
       case REC:
-        //        REC                 EQUAL
-        //         |                 /     \
-        //       EQUAL     ->       X     GAMMA
-        //      /     \                   /    \
-        //     X       E                YSTAR  LAMBDA
-        //                                     /     \
-        //                                    X       E
+
         childNode = node.getChild();
         if(childNode.getType()!=ASTNodeType.EQUAL)
           throw new StandardizeException("REC: child is not EQUAL"); //safety
@@ -205,37 +167,12 @@ public class AST{
         node.setType(ASTNodeType.EQUAL);
         break;
       case LAMBDA:
-        //     LAMBDA        LAMBDA
-        //      /   \   ->   /    \
-        //     V++   E      V     .E
+
         childSibling = node.getChild().getSibling();
         node.getChild().setSibling(constructLambdaChain(childSibling));
         break;
       default:
-        // Node types we do NOT standardize:
-        // CSE Optimization Rule 6 (binops)
-        // OR
-        // AND
-        // PLUS
-        // MINUS
-        // MULT
-        // DIV
-        // EXP
-        // GR
-        // GE
-        // LS
-        // LE
-        // EQ
-        // NE
-        // CSE Optimization Rule 7 (unops)
-        // NOT
-        // NEG
-        // CSE Optimization Rule 8 (conditionals)
-        // CONDITIONAL
-        // CSE Optimization Rule 9, 10 (tuples)
-        // TAU
-        // CSE Optimization Rule 11 (n-ary functions)
-        // COMMA
+
         break;
     }
   }
@@ -249,12 +186,8 @@ public class AST{
     setChild(tauNode, e);
   }
 
-  /**
-   * Either creates a new child of the parent or attaches the child node passed in
-   * as the last sibling of the parent's existing children 
-   * @param parentNode
-   * @param childNode
-   */
+ // This function either creates a new child node for the parent or attaches the provided child node as the last sibling of the parent's existing children.
+ // Parameters: parentNode - The parent node where the new child will be added, childNode - The node to be added as a child or last sibling.
   private void setChild(ASTNode parentNode, ASTNode childNode){
     if(parentNode.getChild()==null)
       parentNode.setChild(childNode);
@@ -279,10 +212,8 @@ public class AST{
     return lambdaNode;
   }
 
-  /**
-   * Creates delta structures from the standardized tree
-   * @return the first delta structure (&delta;0)
-   */
+// Generates delta structures based on the standardized tree.
+// Returns the initial delta structure (&delta;0) as the result.
   public Delta createDeltas(){
     pendingDeltaBodyQueue = new ArrayDeque<PendingDeltaBody>();
     deltaIndex = 0;
@@ -317,9 +248,9 @@ public class AST{
   }
   
   private void buildDeltaBody(ASTNode node, Stack<ASTNode> body){
-    if(node.getType()==ASTNodeType.LAMBDA){ //create a new delta
-      Delta d = createDelta(node.getChild().getSibling()); //the new delta's body starts at the right child of the lambda
-      if(node.getChild().getType()==ASTNodeType.COMMA){ //the left child of the lambda is the bound variable
+    if(node.getType()==ASTNodeType.LAMBDA){
+      Delta d = createDelta(node.getChild().getSibling());
+      if(node.getChild().getType()==ASTNodeType.COMMA){
         ASTNode commaNode = node.getChild();
         ASTNode childNode = commaNode.getChild();
         while(childNode!=null){
@@ -329,17 +260,16 @@ public class AST{
       }
       else
         d.addBoundVars(node.getChild().getValue());
-      body.push(d); //add this new delta to the existing delta's body
+      body.push(d);
       return;
     }
     else if(node.getType()==ASTNodeType.CONDITIONAL){
-      //to enable programming order evaluation, traverse the children in reverse order so the condition leads
-      // cond -> then else becomes then else Beta cond
+
       ASTNode conditionNode = node.getChild();
       ASTNode thenNode = conditionNode.getSibling();
       ASTNode elseNode = thenNode.getSibling();
       
-      //Add a Beta node.
+      //create a Beta node.
       Beta betaNode = new Beta();
       
       buildDeltaBody(thenNode, betaNode.getThenBody());
@@ -352,7 +282,7 @@ public class AST{
       return;
     }
     
-    //preOrder walk
+    //preOrder traverse
     body.push(node);
     ASTNode childNode = node.getChild();
     while(childNode!=null){

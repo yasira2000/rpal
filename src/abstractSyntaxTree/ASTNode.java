@@ -2,10 +2,9 @@ package abstractSyntaxTree;
 
 import CSEMachine.NodeCopier;
 
-/**
- * Abstract Syntax Tree node. Uses a first-child, next-sibling representation.
- * @author Raj
- */
+
+ // Abstract Syntax Tree node.
+
 public class ASTNode{
   private ASTNodeType type;
   private String value;

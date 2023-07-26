@@ -21,14 +21,9 @@ public class Environment{
     this.parent = parent;
   }
   
-  /**
-   * Tries to find the binding of the given key in the mappings of this Environment's
-   * inheritance hierarchy, starting with the Environment this method is invoked on.
-   * 
-   * @param key key the mapping of which to find
-   * @return ASTNode that corresponds to the mapping of the key passed in as an argument
-   *         or null if no mapping was found
-   */
+// Attempts to locate the binding of the provided key within the mappings of this Environment's inheritance hierarchy, starting from the Environment where this method is called.
+// Parameters: key - The key for which to find the mapping within the hierarchy.
+// Returns: The ASTNode that corresponds to the mapping of the given key passed as an argument, or null if no mapping was found.
   public ASTNode lookup(String key){
     ASTNode retValue = null;
     Map<String, ASTNode> map = nameValueMap;
