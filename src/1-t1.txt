@@ -1,0 +1,15 @@
+let modulo = fn (x,y). x-(x/y)*y
+in
+let rec reverse = fn(x,y).
+  x eq 0 -> y |
+  reverse(x/10, y*10 + modulo(x,10))
+in
+let ispal x = x eq reverse(x,0)
+in
+let rec list = fn (x, y, i).
+  x gr y -> i |
+  ispal(x) -> list(x + 1, y, i aug x) | list(x + 1, y, i)
+in
+let output = fn(x, y). list(x, y, nil)
+in
+Print(output(100, 200))
