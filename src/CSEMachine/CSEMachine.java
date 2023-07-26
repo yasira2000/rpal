@@ -13,9 +13,9 @@ public class CSEMachine{
 
   public CSEMachine(AST ast){
     if(!ast.isStandardized())
-      throw new RuntimeException("AST has NOT been standardized!"); //should never happen
+      throw new RuntimeException("AST has NOT been standardized!");
     rootDelta = ast.createDeltas();
-    rootDelta.setLinkedEnv(new Environment()); //primitive environment
+    rootDelta.setLinkedEnv(new Environment());
     valueStack = new Stack<ASTNode>();
   }
 
@@ -24,8 +24,7 @@ public class CSEMachine{
   }
 
   private void processControlStack(Delta currentDelta, Environment currentEnv){
-    //create a new control stack and add all of the delta's body to it so that the delta's body isn't
-    //modified whenever the control stack is popped in all the functions below
+    // Generate a fresh control stack and include the entire body of the delta within it to ensure that modifications to the control stack do not affect the original delta's body across all the subsequent functions.
     Stack<ASTNode> controlStack = new Stack<ASTNode>();
     controlStack.addAll(currentDelta.getBody());
     
@@ -68,7 +67,7 @@ public class CSEMachine{
     }
   }
 
-  // RULE 6
+
   private boolean applyBinaryOperation(ASTNode rator){
     switch(rator.getType()){
       case PLUS:
@@ -263,7 +262,7 @@ public class CSEMachine{
     valueStack.push(rand1);
   }
 
-  // RULE 7
+
   private boolean applyUnaryOperation(ASTNode rator){
     switch(rator.getType()){
       case NOT:
@@ -299,7 +298,7 @@ public class CSEMachine{
     valueStack.push(result);
   }
 
-  //RULE 3
+
   private void applyGamma(Delta currentDelta, ASTNode node, Environment currentEnv, Stack<ASTNode> currentControlStack){
     ASTNode rator = valueStack.pop();
     ASTNode rand = valueStack.pop();
@@ -308,7 +307,6 @@ public class CSEMachine{
       Delta nextDelta = (Delta) rator;
       
       //Delta has a link to the environment in effect when it is pushed on to the value stack (search
-      //for 'RULE 2' in this file to see where it's done)
       //We construct a new environment here that will contain all the bindings (single or multiple)
       //required by this Delta. This new environment will link back to the environment carried by the Delta.
       Environment newEnv = new Environment();
@@ -507,7 +505,7 @@ public class CSEMachine{
       pushFalseNode();
   }
 
-  // RULE 10
+
   private void tupleSelection(Tuple rator, ASTNode rand){
     if(rand.getType()!=ASTNodeType.INTEGER)
       EvaluationError.printError(rand.getSourceLineNumber(), "Non-integer tuple selection with \""+rand.getValue()+"\"");
@@ -519,15 +517,12 @@ public class CSEMachine{
     valueStack.push(result);
   }
 
-  /**
-   * Get the nth element of the tuple. Note that n starts from 1 and NOT 0.
-   * @param tupleNode
-   * @param n n starts from 1 and NOT 0.
-   * @return
-   */
+  // Retrieve the nth element of the tuple. Please note that n starts from 1 and NOT 0.
+  // Parameters: tupleNode - The tuple from which to get the element, n - The position of the element to retrieve (starting from 1, not 0).
+  // Returns: The nth element of the tuple.
   private ASTNode getNthTupleChild(Tuple tupleNode, int n){
     ASTNode childNode = tupleNode.getChild();
-    for(int i=1;i<n;++i){ //tuple selection index starts at 1
+    for(int i=1;i<n;++i){ // index starts at 1
       if(childNode==null)
         break;
       childNode = childNode.getSibling();
@@ -536,7 +531,7 @@ public class CSEMachine{
   }
 
   private void handleIdentifiers(ASTNode node, Environment currentEnv){
-    if(currentEnv.lookup(node.getValue())!=null) // RULE 1
+    if(currentEnv.lookup(node.getValue())!=null)
       valueStack.push(currentEnv.lookup(node.getValue()));
     else if(isReservedIdentifier(node.getValue()))
       valueStack.push(node);
@@ -544,7 +539,7 @@ public class CSEMachine{
       EvaluationError.printError(node.getSourceLineNumber(), "Undeclared identifier \""+node.getValue()+"\"");
   }
 
-  //RULE 9
+
   private void createTuple(ASTNode node){
     int numChildren = getNumChildren(node);
     Tuple tupleNode = new Tuple();
@@ -571,7 +566,7 @@ public class CSEMachine{
     valueStack.push(tupleNode);
   }
 
-  // RULE 8
+
   private void handleBeta(Beta node, Stack<ASTNode> currentControlStack){
     ASTNode conditionResultNode = valueStack.pop();
 
@@ -601,7 +596,7 @@ public class CSEMachine{
     System.out.print(evaluationResult);
   }
 
-  // Note how this list is different from the one defined in Scanner.java
+
   private boolean isReservedIdentifier(String value){
     switch(value){
       case "Isinteger":

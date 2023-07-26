@@ -7,10 +7,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Scanner: Combines a lexer and a screener. Complies with RPAL's Lexicon.
- * @author Raj
- */
+//Scanner(Lexical analysis)
 public class Scanner{
   private BufferedReader buffer;
   private String extraCharRead;
@@ -24,10 +21,8 @@ public class Scanner{
     buffer = new BufferedReader(new InputStreamReader(new FileInputStream(new File(inputFile))));
   }
   
-  /**
-   * Returns next token from input file
-   * @return null if the file has ended
-   */
+  //The function returns the next token from the input file and returns null if the file has reached its end.
+
   public Token readNextToken(){
     Token nextToken = null;
     String nextChar;
@@ -55,11 +50,10 @@ public class Scanner{
     return nextChar;
   }
 
-  /**
-   * Builds next token from input
-   * @param currentChar character currently being processed 
-   * @return token that was built
-   */
+
+  //This function constructs the next token from the input, using the character currentChar that is currently being processed.
+  //It returns the token that was built
+
   private Token buildToken(String currentChar){
     Token nextToken = null;
     if(LexicalPatterns.LetterPattern.matcher(currentChar).matches()){
@@ -83,12 +77,10 @@ public class Scanner{
     return nextToken;
   }
 
-  /**
-   * Builds Identifier token.
-   * Identifier -> Letter (Letter | Digit | '_')*
-   * @param currentChar character currently being processed 
-   * @return token that was built
-   */
+  // This function constructs an Identifier token.
+  //  An Identifier follows the pattern: Letter (Letter | Digit | '_')*
+  //  It uses the character `currentChar` that is currently being processed.
+  // It returns the token that was built, representing the Identifier.
   private Token buildIdentifierToken(String currentChar){
     Token identifierToken = new Token();
     identifierToken.setType(TokenType.IDENTIFIER);
@@ -115,12 +107,10 @@ public class Scanner{
     return identifierToken;
   }
 
-  /**
-   * Builds integer token.
-   * Integer -> Digit+
-   * @param currentChar character currently being processed 
-   * @return token that was built
-   */
+  // This function constructs an Integer token.
+  // An Integer consists of one or more digits: Digit+
+  // It uses the character `currentChar` that is currently being processed.
+  // It returns the token that was built, representing the Integer.
   private Token buildIntegerToken(String currentChar){
     Token integerToken = new Token();
     integerToken.setType(TokenType.INTEGER);
@@ -143,12 +133,10 @@ public class Scanner{
     return integerToken;
   }
 
-  /**
-   * Builds operator token.
-   * Operator -> Operator_symbol+
-   * @param currentChar character currently being processed 
-   * @return token that was built
-   */
+ // This function constructs an Operator token.
+ // An Operator is composed of one or more Operator_symbol characters.
+ //It uses the character `currentChar` that is currently being processed.
+ // It returns the token that was built, representing the Operator.
   private Token buildOperatorToken(String currentChar){
     Token opSymbolToken = new Token();
     opSymbolToken.setType(TokenType.OPERATOR);
@@ -175,12 +163,11 @@ public class Scanner{
     return opSymbolToken;
   }
 
-  /**
-   * Builds string token.
-   * String -> '''' ('\' 't' | '\' 'n' | '\' '\' | '\' '''' |'(' | ')' | ';' | ',' |'' |Letter | Digit | Operator_symbol )* ''''
-   * @param currentChar character currently being processed 
-   * @return token that was built
-   */
+  // This function constructs a String token.
+  // A String is enclosed within four single quotes (''').
+  // The content of the String can include various characters, including escape sequences like '\t', '\n', '\\', '\'', '(', ')', ';', ',', '', Letters, Digits, and Operator_symbols.
+  // It uses the character `currentChar` that is currently being processed.
+  // It returns the token that was built, representing the String.
   private Token buildStringToken(String currentChar){
     Token stringToken = new Token();
     stringToken.setType(TokenType.STRING);

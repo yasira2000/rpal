@@ -13,7 +13,7 @@ import abstractSyntaxTree.ASTNodeType;
  */
 public class Delta extends ASTNode{
   private List<String> boundVars;
-  private Environment linkedEnv; //environment in effect when this Delta was pushed on to the value stack
+  private Environment linkedEnv;
   private Stack<ASTNode> body;
   private int index;
   
@@ -26,7 +26,7 @@ public class Delta extends ASTNode{
     return nodeCopier.copy(this);
   }
   
-  //used if the program evaluation results in a partial application
+
   @Override
   public String getValue(){
     return "[lambda closure: "+boundVars.get(0)+": "+index+"]";

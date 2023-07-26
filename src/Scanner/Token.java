@@ -1,13 +1,10 @@
 package Scanner;
 
 
-/**
- * Token given by the scanner to the parser.
- * A token has a type and a value. The value is unimportant
- * for certain kinds of tokens (e.g. DELETE, L_PAREN tokens).
- * @author Raj
- *
- */
+
+ //The scanner provides tokens to the parser.
+ //A token consists of both a type and a value, with the value being insignificant.
+
 public class Token{
   private TokenType type;
   private String value;
